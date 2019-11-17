@@ -131,12 +131,9 @@ def test_lotka_volterra():
         IVP(t_0=0.0, x_0=1.5),
         IVP(t_0=0.0, x_0=1.0)
     ]
-    nets_lv = [
-        FCNN(n_hidden_units=32, n_hidden_layers=1, actv=SinActv),
-        FCNN(n_hidden_units=32, n_hidden_layers=1, actv=SinActv)
-    ]
+    net_lv = FCNN(n_output_units=2, n_hidden_units=32, n_hidden_layers=1, actv=SinActv)
     solution_lv, _ = solve_system(ode_system=lotka_volterra, conditions=init_vals_lv, 
-                                  t_min=0.0, t_max=12, nets=nets_lv, max_epochs=12000,
+                                  t_min=0.0, t_max=12, net=net_lv, max_epochs=12000,
                                   monitor=Monitor(t_min=0.0, t_max=12, check_every=100))
     ts = np.linspace(0, 12, 100)
     prey_net, pred_net = solution_lv(ts, as_type='np')
