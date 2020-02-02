@@ -5,6 +5,7 @@ import torch.nn as nn
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -39,9 +40,7 @@ class ExampleGenerator3D:
         :type xyz_min: tuple[float, float, float], optional
         :param xyz_max: The upper bound of 3 dimensions, if we only care about :math:`x \\leq x_1`, :math:`y \\leq y_1`, and :math:`z \\leq z_1` then `xyz_max` is `(x_1, y_1, z_1)`, defaults to `(1.0, 1.0, 1.0)`.
         :type xyz_max: tuple[float, float, float], optional
-        :param method: The distribution of the 2-D points generated.
-            If set to 'equally-spaced', the points will be fixed to the grid specified.
-            If set to 'equally-spaced-noisy', a normal noise will be added to the previously mentioned set of points, defaults to 'equally-spaced-noisy'.
+        :param method: The distribution of the 3-D points generated. If set to 'equally-spaced', the points will be fixed to the grid specified. If set to 'equally-spaced-noisy', a normal noise will be added to the previously mentioned set of points, defaults to 'equally-spaced-noisy'.
         :type method: str, optional
         :raises ValueError: When provided with an unknown method.
     """
@@ -87,9 +86,7 @@ class ExampleGeneratorSpherical:
     :type r_min: float, optional
     :param r_max: radius of the exterior boundary
     :type r_max: float, optional
-    :param method: The distribution of the 2-D points generated.
-        If set to 'equally-radius-noisy', radius of the points will be drawn from a uniform distribution :math:`r \\sim U[r_{min}, r_{max}]`
-        If set to 'equally-spaced-noisy', squared radius of the points will be drawn from a uniform distribution :math:`r^2 \\sim U[r_{min}^2, r_{max}^2]`
+    :param method: The distribution of the 3-D points generated. If set to 'equally-radius-noisy', radius of the points will be drawn from a uniform distribution :math:`r \\sim U[r_{min}, r_{max}]`. If set to 'equally-spaced-noisy', squared radius of the points will be drawn from a uniform distribution :math:`r^2 \\sim U[r_{min}^2, r_{max}^2]`
     :type method: str, optional
     """
 
@@ -544,6 +541,7 @@ class MonitorSpherical:
     def __init__(self, r_min, r_max, check_every=100, var_names=None):
         """Initializer method
         """
+        self.using_non_gui_backend = matplotlib.get_backend() is 'agg'
         self.check_every = check_every
         self.fig = None
         self.axs = []  # subplots
@@ -673,7 +671,8 @@ class MonitorSpherical:
         self.fig.canvas.draw()
         # for command-line, interactive plots, not pausing can lead to graphs not being displayed at all
         # see https://stackoverflow.com/questions/19105388/python-2-7-mac-osx-interactive-plotting-with-matplotlib-not-working
-        plt.pause(0.05)
+        if not self.using_non_gui_backend:
+            plt.pause(0.05)
 
     def new(self):
         self.fig = None
